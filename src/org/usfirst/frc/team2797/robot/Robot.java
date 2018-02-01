@@ -14,12 +14,6 @@ import org.usfirst.frc.team2797.robot.subsystems.Drivetrain;
 import org.usfirst.frc.team2797.robot.subsystems.Elevator;
 import org.usfirst.frc.team2797.robot.subsystems.ExampleSubsystem;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -35,18 +29,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 
 
-//remove implementation later
-public class Robot extends TimedRobot implements PIDOutput{
+
+public class Robot extends TimedRobot{
 	public static final ExampleSubsystem kExampleSubsystem
 			= new ExampleSubsystem();
 	public static OI m_oi;
 	public static Drivetrain drivetrain;
 	public static Elevator elevator;
-	public static AHRS ahrs;
 	
-	//Temp PID Controller
-	PIDController turnController;
-	double rotateToAngle;
 	
 	Command m_autonomousCommand;
 	SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -59,26 +49,11 @@ public class Robot extends TimedRobot implements PIDOutput{
 	public void robotInit() {
 		RobotMap.init();
 		drivetrain = new Drivetrain();
-		elevator = new Elevator();
+		//elevator = new Elevator();
 		m_oi = new OI();
 		m_chooser.addDefault("Default Teleop", new TeleopDrive());
 		m_chooser.addObject("My Auto", new AutoDrive());
 		SmartDashboard.putData("Auto mode", m_chooser);
-		
-		try {
-			ahrs = new AHRS(SPI.Port.kMXP);
-		} catch(RuntimeException ex) {
-			DriverStation.reportError("Error instantiating NavX" + ex.getMessage(), true);
-		}
-		
-		
-		
-		//Temp PID Controller
-		turnController = new PIDController(0.3, 0.0, 0.0, 0.0, ahrs, this);
-		turnController.setInputRange(-180.0f, 180.0f);
-		turnController.setOutputRange(-1.0, 1.0);
-		turnController.setAbsoluteTolerance(2.0f);
-		turnController.setContinuous(true);
 		
 	}
 
@@ -90,18 +65,12 @@ public class Robot extends TimedRobot implements PIDOutput{
 	@Override
 	public void disabledInit() {
 			RobotMap.resetEncoders();
-			ahrs.reset();
+			drivetrain.disableDrivetrainPID();
 	}
 
 	@Override
 	public void disabledPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("Gyro Yaw", ahrs.getYaw());
-		SmartDashboard.putNumber("Gyro Pitch", ahrs.getPitch());
-		SmartDashboard.putNumber("Gyro Roll", ahrs.getRoll());
-		SmartDashboard.putNumber("Gyro Disp Y", ahrs.getDisplacementY());
-		SmartDashboard.putNumber("Gyro Disp X", ahrs.getDisplacementX());
-		SmartDashboard.putNumber("Gyro Disp Z", ahrs.getDisplacementZ());
 
 	}
 
@@ -139,6 +108,8 @@ public class Robot extends TimedRobot implements PIDOutput{
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+		SmartDashboard.putNumber("Left Encoder", RobotMap.leftEncoder.get());
+		SmartDashboard.putData("Drivetrain PID", drivetrain.getPIDController());
 	}
 
 	@Override
@@ -167,11 +138,6 @@ public class Robot extends TimedRobot implements PIDOutput{
 	@Override
 	public void testPeriodic() {
 	}
-	
-	public void pidWrite(double output) {
-		rotateToAngle = output;
-	}
-	
 	
 	
 	

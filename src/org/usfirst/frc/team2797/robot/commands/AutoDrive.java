@@ -12,38 +12,43 @@ import edu.wpi.first.wpilibj.command.Command;
 	Each rotation is 360 ticks on the encoder.
 	5 feet is about 1145.91559 encoder ticks.
 */
-public class AutoDrive extends Command{
-	
-	
-	
-	
+public class AutoDrive extends Command {
+
+	private boolean done = false;
+
 	public AutoDrive() {
 		requires(Robot.drivetrain);
 	}
-	
+
 	protected void initialize() {
 		RobotMap.leftEncoder.reset();
 		RobotMap.rightEncoder.reset();
+		Robot.drivetrain.enableDrivetrainPID();
 	}
-	
+
 	protected void execute() {
-		RobotMap.resetEncoders();
-		Robot.drivetrain.driveForwardDistance(10.0, 0.5);
-		Robot.kExampleSubsystem.printLeftEnc();
-		RobotMap.resetEncoders();
-		Robot.drivetrain.driveBackwardDistance(2.0, 0.5);
-		Robot.kExampleSubsystem.printLeftEnc();
-		cancel();
-		
+		do {
+			System.out.println("Moving to 10");
+			Robot.drivetrain.driveForwardDistance(10.0, 0.25);
+		} while (!Robot.drivetrain.getPIDController().onTarget());
+		System.out.println("Done moving to 10");
+		do {
+			System.out.println("Moving to -5");
+			Robot.drivetrain.driveForwardDistance(-5.0, 0.25);
+		} while (!Robot.drivetrain.getPIDController().onTarget());
+		System.out.println("Done moving to -5");
+		done = true;
+
 	}
-	
+
 	protected boolean isFinished() {
-		return false;
+		return done;
 	}
-	
+
 	protected void end() {
+		Robot.drivetrain.stop();
 	}
-	
+
 	protected void interrupted() {
 	}
 

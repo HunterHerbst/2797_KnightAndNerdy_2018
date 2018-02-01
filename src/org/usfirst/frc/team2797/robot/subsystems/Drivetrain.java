@@ -3,78 +3,93 @@ package org.usfirst.frc.team2797.robot.subsystems;
 import org.usfirst.frc.team2797.robot.RobotMap;
 import org.usfirst.frc.team2797.robot.commands.TeleopDrive;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDOutput;
+import edu.wpi.first.wpilibj.command.Subsystem;
 
-public class Drivetrain extends PIDSubsystem {
-	
-	//The circumference of the wheel in feet
-	private final double WheelCircumference = .5*Math.PI;
-	
-	private SpeedControllerGroup leftMotors  = RobotMap.leftDriveMotors,
-								 rightMotors = RobotMap.rightDriveMotors;
-	
-	
-	private Encoder leftEnc  = RobotMap.leftEncoder;
-	private Encoder rightEnc = RobotMap.rightEncoder;
-	
-	
-	private final DifferentialDrive robotDrivetrain = RobotMap.drivetrainTankDrive;
-	
+public class Drivetrain extends Subsystem implements PIDOutput {
+
+	// The circumference of the wheel in feet
+	private final double WheelCircumference = .5 * Math.PI;
+	private PIDController wheelControl;
+
+	// private static Encoder rightEnc = RobotMap.rightEncoder;
+
+
 	public Drivetrain() {
-		super("Drivetrain", 1.0, 0.0, 0.0, 0.5);
-		setAbsoluteTolerance(0.2);
-		getPIDController().setContinuous(false);
+		wheelControl = new PIDController(0.0075, 0.0, 0.0, RobotMap.leftEncoder, this);
+		//System.out.println("Setting AbsTolerance");
+		wheelControl.setAbsoluteTolerance(1.0);
+		
+		//System.out.println("Setting PercTolerance");
+		wheelControl.setPercentTolerance(10.0);
+		
+		//System.out.println("Setting Output Range");
+		wheelControl.setOutputRange(-0.75, 0.75);
+		
+		//System.out.println("Setting Continuous to false");
+		wheelControl.setContinuous(false);
+		
+		//System.out.println("Disabling wheelController PIDController");
+		wheelControl.disable();
 	}
+
+	public PIDController getPIDController() {
+		return wheelControl;
+	}
+
+	public void enableDrivetrainPID() {
+		wheelControl.enable();
+	}
+	
+	public void disableDrivetrainPID() {
+		wheelControl.disable();
+	}
+	
+	
 	
 	public void initDefaultCommand() {
 		setDefaultCommand(new TeleopDrive());
 	}
+
 	
-	protected double returnPIDInput() {
-		return leftEnc.pidGet();
-	}
 	
-	protected double returnPIDInput(boolean leftSide) {
-		if(leftSide)
-			return leftEnc.pidGet();
-		else
-			return rightEnc.pidGet();
-	}
-	
-	protected void usePIDOutput(double output) {
-		leftMotors.pidWrite(output);
-	}
-	
-	protected void usePIDOutput(double output, boolean leftSide) {
-		if(leftSide)
-			leftMotors.pidWrite(output);
-		else
-			rightMotors.pidWrite(output);
-	}
 	
 	public void driveRobot(double leftSpeed, double rightSpeed) {
-		robotDrivetrain.tankDrive(leftSpeed*-1, rightSpeed*-1);
+		RobotMap.drivetrainTankDrive.tankDrive(leftSpeed * -1, rightSpeed * -1);
 	}
-	
+
 	public void stop() {
-		robotDrivetrain.tankDrive(0, 0);
+		RobotMap.drivetrainTankDrive.tankDrive(0, 0);
+		wheelControl.disable();
 	}
+
+	
+	
+	
 	
 	public void driveForwardDistance(double distance, double speed) {
+		//System.out.println((int) (distance * (360 / WheelCircumference)));
+		wheelControl.setSetpoint((int) (distance * (360 / WheelCircumference)));
+		// wheelControl.setOutputRange(-speed, speed);
 		
-		double encCount = distance*(360/WheelCircumference);
-		while(RobotMap.leftEncoder.get() <= encCount) {
-			driveRobot(speed, speed);
-		}
-		
+		//System.out.println("Enabling wheelController");
+		//wheelControl.enable();
+
 	}
+
 	public void driveBackwardDistance(double distance, double speed) {
-		double encCount = distance*(360/WheelCircumference);
-		while(RobotMap.leftEncoder.get() >= -encCount) {
+		double encCount = distance * (360 / WheelCircumference);
+		while (RobotMap.leftEncoder.get() >= -encCount) {
 			driveRobot(-speed, -speed);
 		}
+	}
+
+	
+	
+	
+	
+	public void pidWrite(double output) {
+		RobotMap.drivetrainTankDrive.tankDrive(output, output);
 	}
 }

@@ -10,7 +10,7 @@ public class TeleopDrive extends Command{
 	
 	public TeleopDrive() {
 		requires(Robot.drivetrain);
-		requires(Robot.elevator);
+		//requires(Robot.elevator);
 	}
 	
 	protected boolean isFinished() {
@@ -19,7 +19,7 @@ public class TeleopDrive extends Command{
 	
 	protected void execute() {
 		Robot.drivetrain.driveRobot(OI.gamepad.getRawAxis(1), OI.gamepad.getRawAxis(5));
-		Robot.elevator.moveElevator(OI.gamepad.getRawAxis(2), OI.gamepad.getRawAxis(3));
+		//Robot.elevator.moveElevator(OI.gamepad.getRawAxis(2), OI.gamepad.getRawAxis(3));
 		OI.aButton.whenPressed(new ExampleCommand());
 	}
 	

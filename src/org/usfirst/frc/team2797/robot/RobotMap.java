@@ -8,8 +8,11 @@
 
 package org.usfirst.frc.team2797.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -38,7 +41,7 @@ public class RobotMap {
 					  elevatorEncChA = 4,
 					  elevatorEncChB = 5;
 	
-	public static boolean leftEncDirection  = true,
+	public static boolean leftEncDirection  = false,
 						  rightEncDirection = false,
 						  elevatorDirection = true;
 	
@@ -58,7 +61,7 @@ public class RobotMap {
 	
 	public static DifferentialDrive drivetrainTankDrive = new DifferentialDrive(leftDriveMotors, rightDriveMotors);
 	
-	
+	//public static AHRS gyro = new AHRS(SPI.Port.kMXP);
 	
 	
 	
