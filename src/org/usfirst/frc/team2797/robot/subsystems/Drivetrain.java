@@ -19,7 +19,7 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	public Drivetrain() {
 		wheelControl = new PIDController(0.0075, 0.0, 0.0, RobotMap.leftEncoder, this);
 		//System.out.println("Setting AbsTolerance");
-		wheelControl.setAbsoluteTolerance(1.0);
+		//wheelControl.setAbsoluteTolerance(1.0);
 		
 		//System.out.println("Setting PercTolerance");
 		wheelControl.setPercentTolerance(10.0);
@@ -44,6 +44,10 @@ public class Drivetrain extends Subsystem implements PIDOutput {
 	
 	public void disableDrivetrainPID() {
 		wheelControl.disable();
+	}
+	
+	public boolean isPIDEnabled() {
+		return wheelControl.isEnabled();
 	}
 	
 	

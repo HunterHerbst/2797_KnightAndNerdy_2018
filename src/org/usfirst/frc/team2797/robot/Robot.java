@@ -17,6 +17,7 @@ import org.usfirst.frc.team2797.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot{
 	public static OI m_oi;
 	public static Drivetrain drivetrain;
 	public static Elevator elevator;
+	public static LiveWindow lw;
 	
 	
 	Command m_autonomousCommand;
@@ -51,9 +53,17 @@ public class Robot extends TimedRobot{
 		drivetrain = new Drivetrain();
 		//elevator = new Elevator();
 		m_oi = new OI();
+		//SmartDashboard stuff
 		m_chooser.addDefault("Default Teleop", new TeleopDrive());
 		m_chooser.addObject("My Auto", new AutoDrive());
 		SmartDashboard.putData("Auto mode", m_chooser);
+		SmartDashboard.putNumber("Left Encoder", RobotMap.leftEncoder.get());
+		SmartDashboard.putData("Drivetrain PID", drivetrain.getPIDController());
+		SmartDashboard.putNumber("PID Error", drivetrain.getPIDController().getError());
+		
+		//LiveWindow stuff
+		
+		
 		
 	}
 
@@ -108,8 +118,7 @@ public class Robot extends TimedRobot{
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("Left Encoder", RobotMap.leftEncoder.get());
-		SmartDashboard.putData("Drivetrain PID", drivetrain.getPIDController());
+		SmartDashboard.updateValues();
 	}
 
 	@Override
@@ -137,6 +146,7 @@ public class Robot extends TimedRobot{
 	 */
 	@Override
 	public void testPeriodic() {
+		
 	}
 	
 	

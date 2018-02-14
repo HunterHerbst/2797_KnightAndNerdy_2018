@@ -21,22 +21,24 @@ public class AutoDrive extends Command {
 	}
 
 	protected void initialize() {
-		RobotMap.leftEncoder.reset();
-		RobotMap.rightEncoder.reset();
+		RobotMap.resetEncoders();
+		done = false;
 		Robot.drivetrain.enableDrivetrainPID();
 	}
 
 	protected void execute() {
+		
+		if(!Robot.drivetrain.isPIDEnabled()) 
+			Robot.drivetrain.enableDrivetrainPID();
+		
 		do {
-			System.out.println("Moving to 10");
 			Robot.drivetrain.driveForwardDistance(10.0, 0.25);
-		} while (!Robot.drivetrain.getPIDController().onTarget());
-		System.out.println("Done moving to 10");
+		} while (!(Robot.drivetrain.getPIDController().onTarget()));
+		
 		do {
-			System.out.println("Moving to -5");
 			Robot.drivetrain.driveForwardDistance(-5.0, 0.25);
 		} while (!Robot.drivetrain.getPIDController().onTarget());
-		System.out.println("Done moving to -5");
+		
 		done = true;
 
 	}
